@@ -1,19 +1,19 @@
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
-  name: {{ template "cspconsole.fullname" . }}
+  name: {{ template "cspconsole.fullname" . }}-report-collector
   namespace: {{ required "Namespace not set" .Values.namespace }}
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: {{ template "cspconsole.fullname" . }}
-  minReplicas: {{ .Values.hpa.replicaCount }}
-  maxReplicas: 10
+    name: {{ template "cspconsole.fullname" . }}-report-collector
+  minReplicas: {{ .Values.reportCollector.hpa.minReplicas }}
+  maxReplicas: {{ .Values.reportCollector.hpa.maxReplicas }}
   metrics:
     - type: Resource
       resource:
         name: cpu
         target:
           type: Utilization
-          averageUtilization: 70
+          averageUtilization: {{ .Values.reportCollector.hpa.averageUtilization }}

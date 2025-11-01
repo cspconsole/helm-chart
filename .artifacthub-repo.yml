@@ -1,0 +1,4 @@
+repositoryID: cspconsole-helm-chart
+owners:
+  - name: cspconsole
+    email: developers@cspconsole.com

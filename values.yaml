@@ -2,28 +2,31 @@
 # Declare variables to be passed into your templates.
 global:
   ingress:
-      host: "api.cspconsole.com"
-      projects:
-        - www-example-com
-      tls:
-        hosts:
-          - *.api.cspconsole.com
+    enabled: true
+    ingressClassName: api-nginx
+    hosts: 
+      - "api.cspconsole.com"
+    tls:
+      hosts:
+        - *.api.cspconsole.com
 
 reportCollector:
   hpa:
-    replicaCount: 2
-    minAvailable: 1
+    minReplicas: 2
+    maxReplicas: 10
+    averageUtilization: 70
 
   # 15s application + 10s sleep to deregister pod + 5s reserve
   terminationGracePeriod: 30
-  #volume:
-    #storageClassName:
   secret:
     name: cspconsole
   deployment:
     type: RollingUpdate
     maxSurge: 1
     maxUnavailable: 1
+  podDisruptionBudget:
+    minAvailable: 1
+
 
   image:
     repository: cspconsole.azurecr.io/cspconsole/app
@@ -60,10 +63,12 @@ reportCollector:
   tolerations: []
 
   affinity: {}
+
 configProvider:
   hpa:
-    replicaCount: 1
-    minAvailable: 1
+    minReplicas: 1
+    maxReplicas: 10
+    averageUtilization: 70
 
   # 15s application + 10s sleep to deregister pod + 5s reserve
   terminationGracePeriod: 30
@@ -76,17 +81,13 @@ configProvider:
     maxSurge: 1
     maxUnavailable: 1
 
+  podDisruptionBudget:
+    minAvailable: 1
+
   image:
+    repository: cspconsole.azurecr.io/cspconsole/app
+    tag: 1.x.x  
     pullPolicy: Always
-    containerRegistryUrl: cspconsole.azurecr.io
-    application:
-      repositoryPath: /cspconsole/app
-      #queue:
-        #serviceIp: xxx.xxx.xxx.xxx
-      #tag: 1.x.x
-      #version: v1.0.0-az-prod
-      #env:
-        #queueName: "csp-reports"
 
   service:
     type: ClusterIP

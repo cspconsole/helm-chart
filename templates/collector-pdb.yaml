@@ -1,9 +1,9 @@
 apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
-  name: {{ template "cspconsole.fullname" . }}
+  name: {{ template "cspconsole.fullname" . }}-report-collector
 spec:
-  minAvailable: {{ .Values.hpa.minAvailable }}
+  minAvailable: {{ .Values.reportCollector.podDisruptionBudget.minAvailable }}
   selector:
     matchLabels:
-      app: {{ template "cspconsole.fullname" . }}
+      app: {{ template "cspconsole.fullname" . }}-report-collector

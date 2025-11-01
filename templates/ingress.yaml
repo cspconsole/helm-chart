@@ -1,5 +1,4 @@
-{{- if eq .Values.deploymentType "ingress" -}}
-{{- $host := index .Values.ingress "host" -}}
+{{- if .Values.global.ingress.enabled -}}
 {{- $serviceName := include "cspconsole.fullname" . -}}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
@@ -21,23 +20,32 @@ metadata:
     nginx.ingress.kubernetes.io/cors-allow-credentials: "false"
     nginx.ingress.kubernetes.io/cors-allow-methods: GET, POST, OPTIONS
 spec:
-  ingressClassName: api-nginx
+{{- if .Values.global.ingress.ingressClassName }}
+  ingressClassName: {{ .Values.global.ingress.ingressClassName }}
+{{- end }}
   tls:
   - hosts:
-  {{- range .Values.ingress.tls.hosts }}
+  {{- range .Values.global.ingress.tls.hosts }}
     - {{ . | quote }}
   {{- end }}
     secretName: {{ template "cspconsole.fullname" . }}-certs
   rules:
-  {{- range $key,$value := .Values.ingress.projects }}
-    - host: {{ printf "%s.%s" . $host | quote }}
+  {{- range $key,$value := .Values.global.ingress.hosts }}
+    - host: {{ $value | quote }}
       http:
         paths:
           - path: /v1/(csp/)?reports?
             pathType: ImplementationSpecific
             backend:
               service:
-                name: {{ $serviceName }}
+                name: {{ $serviceName }}-report-collector
+                port:
+                  number: 80
+          - path: /v1/csp/(hash|header|directives)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: {{ $serviceName }}-config-provider
                 port:
                   number: 80
   {{- end }}

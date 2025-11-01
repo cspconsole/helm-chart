@@ -1,13 +1,13 @@
 kind: Service
 apiVersion: v1
 metadata:
-  name: {{ template "cspconsole.fullname" . }}
+  name: {{ template "cspconsole.fullname" . }}-report-collector
   namespace: {{ required "Namespace not set" .Values.namespace }}
 spec:
   selector:
     app: {{ template "cspconsole.fullname" . }}
   ports:
-{{- range $index, $value := .Values.service.ports }}
+{{- range $index, $value := .Values.reportCollector.service.ports }}
     - name: {{ $index }}
 {{ toYaml $value | trim | indent 6 }}{{- end}}
-  type: {{ .Values.service.type }}
+  type: {{ .Values.reportCollector.service.type }}
