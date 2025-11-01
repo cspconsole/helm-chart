@@ -1,0 +1,115 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "cspconsole.fullname" . }}-config-provider
+  namespace: {{ required "Namespace not set" .Values.configProvider.namespace }}
+spec:
+  replicas: {{ .Values.configProvider.hpa.replicaCount }}
+  strategy:
+    type: {{ .Values.configProvider.deployment.type }}
+    {{- if eq .Values.configProvider.deployment.type "RollingUpdate" }}
+    rollingUpdate:
+      maxSurge: {{ .Values.configProvider.deployment.maxSurge }}
+      maxUnavailable: {{ .Values.configProvider.deployment.maxUnavailable }}
+    {{- end }}
+  selector:
+    matchLabels:
+      app: {{ template "cspconsole.fullname" . }}-config-provider
+  template:
+    metadata:
+      labels:
+        app: {{ template "cspconsole.fullname" . }}-config-provider
+    spec:
+      {{- if .Values.configProvider.nodeSelector }}
+      nodeSelector:
+        {{- toYaml .Values.configProvider.nodeSelector | nindent 8 }}
+      {{- end }}
+      priorityClassName: high-priority
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - {{ template "cspconsole.fullname" . }}-config-provider
+              topologyKey: "kubernetes.io/hostname"
+      terminationGracePeriodSeconds: {{ .Values.configProvider.terminationGracePeriod }}
+      containers:
+      - name: config-provider
+        image: {{ template "cspconsole.configProvider.repository" . }}
+        imagePullPolicy: {{ .Values.configProvider.image.pullPolicy }}
+        securityContext:
+          runAsNonRoot: true
+        ports:
+          - containerPort: 8000
+        env:
+        - name: DEBUG
+          value: {{ .Values.configProvider.image.application.env.debug | quote }}
+        - name: DB_HOST
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.configProvider.secret.name }}
+              key: dbHost
+        - name: DB_PORT
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.configProvider.secret.name }}
+              key: dbPort
+        - name: DB_DATABASE
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.configProvider.secret.name }}
+              key: dbName
+        - name: DB_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.configProvider.secret.name }}
+              key: dbUsername
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.configProvider.secret.name }}
+              key: dbPassword
+        - name: REDIS_HOST
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.configProvider.secret.name }}
+              key: redisHost
+        - name: REDIS_PORT
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.configProvider.secret.name }}
+              key: redisPort
+        livenessProbe:
+          exec:
+            command:
+              - /bin/sh
+              - -c
+              - /opt/scripts/ping.sh
+          initialDelaySeconds: 5
+          periodSeconds: 60
+          timeoutSeconds: 5
+          successThreshold: 1
+          failureThreshold: 3
+        readinessProbe:
+          exec:
+            command:
+              - /bin/sh
+              - -c
+              - /opt/scripts/status.sh
+          initialDelaySeconds: 5
+          periodSeconds: 15
+          timeoutSeconds: 5
+          successThreshold: 1
+          failureThreshold: 2
+        resources:
+          requests:
+            cpu: {{ .Values.configProvider.resources.requests.cpu }}
+            memory: {{ .Values.configProvider.resources.requests.memory }}
+          limits:
+            cpu: {{ .Values.configProvider.resources.limits.cpu }}
+            memory: {{ .Values.configProvider.resources.limits.memory }}

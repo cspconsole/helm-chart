@@ -1,0 +1,162 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "cspconsole.fullname" . }}-report-collector
+  namespace: {{ required "Namespace not set" .Values.reportCollector.namespace }}
+spec:
+  replicas: {{ .Values.reportCollector.hpa.replicaCount }}
+  strategy:
+    type: {{ .Values.reportCollector.deployment.type }}
+    {{- if eq .Values.reportCollector.deployment.type "RollingUpdate" }}
+    rollingUpdate:
+      maxSurge: {{ .Values.reportCollector.deployment.maxSurge }}
+      maxUnavailable: {{ .Values.reportCollector.deployment.maxUnavailable }}
+    {{- end }}
+  selector:
+    matchLabels:
+      app: {{ template "cspconsole.fullname" . }}-report-collector
+  template:
+    metadata:
+      labels:
+        app: {{ template "cspconsole.fullname" . }}-report-collector
+    spec:
+      {{- if .Values.reportCollector.nodeSelector }}
+      nodeSelector:
+        {{- toYaml .Values.reportCollector.nodeSelector | nindent 8 }}
+      {{- end }}
+      priorityClassName: high-priority
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - {{ template "cspconsole.fullname" . }}-report-collector
+              topologyKey: "kubernetes.io/hostname"
+      terminationGracePeriodSeconds: {{ .Values.reportCollector.terminationGracePeriod }}
+      hostAliases:
+      - ip: {{ .Values.reportCollector.image.application.queue.serviceIp }}
+        hostnames:
+        - "rabbitmq.default.svc.cluster.local"
+      containers:
+      - name: report-collector
+        image: {{ template "cspconsole.reportCollector.repository" . }}
+        imagePullPolicy: {{ .Values.reportCollector.image.pullPolicy }}
+        securityContext:
+          runAsNonRoot: true
+        ports:
+          - containerPort: 8000
+        env:
+        - name: QUEUE_HOST
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.reportCollector.secret.name }}
+              key: queueHost
+        - name: QUEUE_PORT
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.reportCollector.secret.name }}
+              key: queuePort
+        - name: QUEUE_NAME
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.reportCollector.secret.name }}
+              key: queueName
+        - name: EXCHANGE_NAME
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.reportCollector.secret.name }}
+              key: exchangeName
+        - name: QUEUE_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.reportCollector.secret.name }}
+              key: queueUsername
+        - name: QUEUE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.reportCollector.secret.name }}
+              key: queuePassword
+        - name: QUEUE_CACERT_FILE
+          value: "/var/www/cspconsole/certs/ca_certificate.pem"
+        - name: DEBUG
+          value: {{ .Values.reportCollector.image.application.env.debug | quote }}
+        - name: DB_HOST
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.reportCollector.secret.name }}
+              key: dbHost
+        - name: DB_PORT
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.reportCollector.secret.name }}
+              key: dbPort
+        - name: DB_DATABASE
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.reportCollector.secret.name }}
+              key: dbName
+        - name: DB_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.reportCollector.secret.name }}
+              key: dbUsername
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.reportCollector.secret.name }}
+              key: dbPassword
+        - name: REDIS_HOST
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.reportCollector.secret.name }}
+              key: redisHost
+        - name: REDIS_PORT
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.reportCollector.secret.name }}
+              key: redisPort
+        livenessProbe:
+          exec:
+            command:
+              - /bin/sh
+              - -c
+              - /opt/scripts/ping.sh
+          initialDelaySeconds: 5
+          periodSeconds: 60
+          timeoutSeconds: 5
+          successThreshold: 1
+          failureThreshold: 3
+        readinessProbe:
+          exec:
+            command:
+              - /bin/sh
+              - -c
+              - /opt/scripts/status.sh
+          initialDelaySeconds: 5
+          periodSeconds: 15
+          timeoutSeconds: 5
+          successThreshold: 1
+          failureThreshold: 2
+        resources:
+          requests:
+            cpu: {{ .Values.reportCollector.resources.requests.cpu }}
+            memory: {{ .Values.reportCollector.resources.requests.memory }}
+          limits:
+            cpu: {{ .Values.reportCollector.resources.limits.cpu }}
+            memory: {{ .Values.reportCollector.resources.limits.memory }}
+        volumeMounts:
+        - name: queue-cacert
+          mountPath: /var/www/cspconsole/certs/
+          readOnly: true
+      volumes:
+      - name: queue-cacert
+        secret:
+          secretName: {{ template "cspconsole.fullname" . }}
+          items:
+            - key: queueCa.crt
+              path: ca_certificate.pem

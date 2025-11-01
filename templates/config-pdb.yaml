@@ -1,0 +1,9 @@
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ template "cspconsole.fullname" . }}
+spec:
+  minAvailable: {{ .Values.hpa.minAvailable }}
+  selector:
+    matchLabels:
+      app: {{ template "cspconsole.fullname" . }}

@@ -1,0 +1,13 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: {{ template "cspconsole.fullname" . }}
+  namespace: {{ required "Namespace not set" .Values.namespace }}
+spec:
+  selector:
+    app: {{ template "cspconsole.fullname" . }}
+  ports:
+{{- range $index, $value := .Values.service.ports }}
+    - name: {{ $index }}
+{{ toYaml $value | trim | indent 6 }}{{- end}}
+  type: {{ .Values.service.type }}
