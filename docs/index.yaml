@@ -19,7 +19,7 @@ entries:
     - application
     maintainers:
     - email: martin@cspconsole.com
-      name: Martin
+      name: Martin Čambal
     name: cspconsole
     sources:
     - https://github.com/cspconsole/helm-chart
