@@ -18,7 +18,7 @@ entries:
     - kubernetes
     - application
     maintainers:
-    - email: maintainer@cspconsole.com
+    - email: martin@cspconsole.com
       name: Martin
     name: cspconsole
     sources:
