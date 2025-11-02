@@ -83,8 +83,6 @@ spec:
               key: queuePassword
         - name: QUEUE_CACERT_FILE
           value: "/var/www/cspconsole/certs/ca_certificate.pem"
-        - name: DEBUG
-          value: {{ .Values.reportCollector.image.application.env.debug | quote }}
         - name: DB_HOST
           valueFrom:
             secretKeyRef:
