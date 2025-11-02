@@ -39,7 +39,7 @@ spec:
               topologyKey: "kubernetes.io/hostname"
       terminationGracePeriodSeconds: {{ .Values.reportCollector.terminationGracePeriod }}
       hostAliases:
-      - ip: {{ .Values.reportCollector.image.application.queue.serviceIp }}
+      - ip: {{ .Values.reportCollector.envs.queueServiceIp }}
         hostnames:
         - "rabbitmq.default.svc.cluster.local"
       containers:

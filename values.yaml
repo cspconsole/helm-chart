@@ -33,6 +33,9 @@ reportCollector:
     repository: cspconsole/report-collector
     tag: latest
     pullPolicy: Always
+
+  envs:
+    # queueServiceIp: 10.0.0.1
       
   service:
     type: ClusterIP
@@ -89,6 +92,9 @@ configProvider:
     repository: cspconsole/config-provider
     tag: latest
     pullPolicy: Always
+
+  envs:
+    # dbServiceIp: 10.0.0.1
 
   service:
     type: ClusterIP
