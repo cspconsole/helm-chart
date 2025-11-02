@@ -154,7 +154,7 @@ spec:
       volumes:
       - name: queue-cacert
         secret:
-          secretName: {{ template "cspconsole.fullname" . }}
+          secretName: {{ .Values.reportCollector.secretName }}
           items:
             - key: queueCa.crt
               path: ca_certificate.pem
