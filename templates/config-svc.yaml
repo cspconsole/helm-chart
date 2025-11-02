@@ -2,7 +2,7 @@ kind: Service
 apiVersion: v1
 metadata:
   name: {{ template "cspconsole.fullname" . }}-config-provider
-  namespace: {{ required "Namespace not set" .Values.namespace }}
+  namespace: {{ .Release.Namespace }}
 spec:
   selector:
     app: {{ template "cspconsole.fullname" . }}

@@ -1,6 +1,7 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 global:
+  namespace: cspconsole
   ingress:
     enabled: true
     ingressClassName: api-nginx
@@ -19,7 +20,7 @@ reportCollector:
   # 15s application + 10s sleep to deregister pod + 5s reserve
   terminationGracePeriod: 30
   secret:
-    name: cspconsole
+    name: report-collector
   deployment:
     type: RollingUpdate
     maxSurge: 1
@@ -29,8 +30,8 @@ reportCollector:
 
 
   image:
-    repository: cspconsole.azurecr.io/cspconsole/app
-    tag: 1.x.x
+    repository: cspconsole/report-collector
+    tag: latest
     pullPolicy: Always
       
   service:
@@ -75,7 +76,7 @@ configProvider:
   #volume:
     #storageClassName:
   secret:
-    name: cspconsole
+    name: config-provider
   deployment:
     type: RollingUpdate
     maxSurge: 1
@@ -85,8 +86,8 @@ configProvider:
     minAvailable: 1
 
   image:
-    repository: cspconsole.azurecr.io/cspconsole/app
-    tag: 1.x.x  
+    repository: cspconsole/config-provider
+    tag: latest
     pullPolicy: Always
 
   service:
