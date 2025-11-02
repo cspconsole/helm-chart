@@ -30,8 +30,8 @@ spec:
   {{- end }}
     secretName: {{ template "cspconsole.fullname" . }}-certs
   rules:
-  {{- range $key,$value := .Values.global.ingress.hosts }}
-    - host: {{ $value | quote }}
+  {{- range .Values.global.ingress.hosts }}
+    - host: {{ . | quote }}
       http:
         paths:
           - path: /v1/(csp/)?reports?
