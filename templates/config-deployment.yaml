@@ -47,8 +47,6 @@ spec:
         ports:
           - containerPort: 8000
         env:
-        - name: DEBUG
-          value: {{ .Values.configProvider.image.application.env.debug | quote }}
         - name: DB_HOST
           valueFrom:
             secretKeyRef:
