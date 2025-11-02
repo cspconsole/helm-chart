@@ -5,7 +5,7 @@ metadata:
   namespace: {{ .Release.Namespace }}
 spec:
   selector:
-    app: {{ template "cspconsole.fullname" . }}
+    app: {{ template "cspconsole.fullname" . }}-config-provider
   ports:
 {{- range $index, $value := .Values.configProvider.service.ports }}
     - name: {{ $index }}
