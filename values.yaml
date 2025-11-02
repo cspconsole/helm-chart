@@ -19,8 +19,7 @@ reportCollector:
 
   # 15s application + 10s sleep to deregister pod + 5s reserve
   terminationGracePeriod: 30
-  secret:
-    name: report-collector
+  secretName: report-collector
   deployment:
     type: RollingUpdate
     maxSurge: 1
@@ -78,8 +77,7 @@ configProvider:
   terminationGracePeriod: 30
   #volume:
     #storageClassName:
-  secret:
-    name: config-provider
+  secretName: config-provider
   deployment:
     type: RollingUpdate
     maxSurge: 1

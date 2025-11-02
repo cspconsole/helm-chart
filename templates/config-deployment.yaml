@@ -50,37 +50,37 @@ spec:
         - name: DB_HOST
           valueFrom:
             secretKeyRef:
-              name: {{ .Values.configProvider.secret.name }}
+              name: {{ .Values.configProvider.secretName }}
               key: dbHost
         - name: DB_PORT
           valueFrom:
             secretKeyRef:
-              name: {{ .Values.configProvider.secret.name }}
+              name: {{ .Values.configProvider.secretName }}
               key: dbPort
         - name: DB_DATABASE
           valueFrom:
             secretKeyRef:
-              name: {{ .Values.configProvider.secret.name }}
+              name: {{ .Values.configProvider.secretName }}
               key: dbName
         - name: DB_USERNAME
           valueFrom:
             secretKeyRef:
-              name: {{ .Values.configProvider.secret.name }}
+              name: {{ .Values.configProvider.secretName }}
               key: dbUsername
         - name: DB_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: {{ .Values.configProvider.secret.name }}
+              name: {{ .Values.configProvider.secretName }}
               key: dbPassword
         - name: REDIS_HOST
           valueFrom:
             secretKeyRef:
-              name: {{ .Values.configProvider.secret.name }}
+              name: {{ .Values.configProvider.secretName }}
               key: redisHost
         - name: REDIS_PORT
           valueFrom:
             secretKeyRef:
-              name: {{ .Values.configProvider.secret.name }}
+              name: {{ .Values.configProvider.secretName }}
               key: redisPort
         livenessProbe:
           exec:

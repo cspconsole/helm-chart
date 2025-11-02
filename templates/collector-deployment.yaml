@@ -54,69 +54,69 @@ spec:
         - name: QUEUE_HOST
           valueFrom:
             secretKeyRef:
-              name: {{ .Values.reportCollector.secret.name }}
+              name: {{ .Values.reportCollector.secretName }}
               key: queueHost
         - name: QUEUE_PORT
           valueFrom:
             secretKeyRef:
-              name: {{ .Values.reportCollector.secret.name }}
+              name: {{ .Values.reportCollector.secretName }}
               key: queuePort
         - name: QUEUE_NAME
           valueFrom:
             secretKeyRef:
-              name: {{ .Values.reportCollector.secret.name }}
+              name: {{ .Values.reportCollector.secretName }}
               key: queueName
         - name: EXCHANGE_NAME
           valueFrom:
             secretKeyRef:
-              name: {{ .Values.reportCollector.secret.name }}
+              name: {{ .Values.reportCollector.secretName }}
               key: exchangeName
         - name: QUEUE_USERNAME
           valueFrom:
             secretKeyRef:
-              name: {{ .Values.reportCollector.secret.name }}
+              name: {{ .Values.reportCollector.secretName }}
               key: queueUsername
         - name: QUEUE_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: {{ .Values.reportCollector.secret.name }}
+              name: {{ .Values.reportCollector.secretName }}
               key: queuePassword
         - name: QUEUE_CACERT_FILE
           value: "/var/www/cspconsole/certs/ca_certificate.pem"
         - name: DB_HOST
           valueFrom:
             secretKeyRef:
-              name: {{ .Values.reportCollector.secret.name }}
+              name: {{ .Values.reportCollector.secretName }}
               key: dbHost
         - name: DB_PORT
           valueFrom:
             secretKeyRef:
-              name: {{ .Values.reportCollector.secret.name }}
+              name: {{ .Values.reportCollector.secretName }}
               key: dbPort
         - name: DB_DATABASE
           valueFrom:
             secretKeyRef:
-              name: {{ .Values.reportCollector.secret.name }}
+              name: {{ .Values.reportCollector.secretName }}
               key: dbName
         - name: DB_USERNAME
           valueFrom:
             secretKeyRef:
-              name: {{ .Values.reportCollector.secret.name }}
+              name: {{ .Values.reportCollector.secretName }}
               key: dbUsername
         - name: DB_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: {{ .Values.reportCollector.secret.name }}
+              name: {{ .Values.reportCollector.secretName }}
               key: dbPassword
         - name: REDIS_HOST
           valueFrom:
             secretKeyRef:
-              name: {{ .Values.reportCollector.secret.name }}
+              name: {{ .Values.reportCollector.secretName }}
               key: redisHost
         - name: REDIS_PORT
           valueFrom:
             secretKeyRef:
-              name: {{ .Values.reportCollector.secret.name }}
+              name: {{ .Values.reportCollector.secretName }}
               key: redisPort
         livenessProbe:
           exec:

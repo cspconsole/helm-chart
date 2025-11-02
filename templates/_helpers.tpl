@@ -12,10 +12,10 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 If release name contains chart name it will be used as a full name.
 */}}
 {{- define "cspconsole.reportCollector.repository" -}}
-{{- printf "%s%s:%s" .Values.reportCollector.image.repository .Values.reportCollector.image.tag -}}
+{{- printf "%s:%s" .Values.reportCollector.image.repository .Values.reportCollector.image.tag -}}
 {{- end -}}
 {{- define "cspconsole.configProvider.repository" -}}
-{{- printf "%s%s:%s" .Values.configProvider.image.repository .Values.configProvider.image.tag -}}
+{{- printf "%s:%s" .Values.configProvider.image.repository .Values.configProvider.image.tag -}}
 {{- end -}}
 {{- define "cspconsole.fullname" -}}
 {{- if .Values.fullnameOverride -}}
