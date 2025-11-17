@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ template "cspconsole.fullname" . }}-report-collector
-  namespace: {{ .Release.Namespace }}
+  namespace: {{ required "Namespace not set" .Values.global.namespace }}
 spec:
   replicas: {{ .Values.reportCollector.hpa.replicaCount }}
   strategy:

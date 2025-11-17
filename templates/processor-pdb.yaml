@@ -2,6 +2,7 @@ apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
   name: {{ template "cspconsole.fullname" . }}-processor
+  namespace: {{ required "Namespace not set" .Values.global.namespace }}
 spec:
   minAvailable: {{ .Values.reportProcessor.podDisruptionBudget.minAvailable }}
   selector:

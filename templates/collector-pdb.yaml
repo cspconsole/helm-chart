@@ -2,7 +2,7 @@ apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
   name: {{ template "cspconsole.fullname" . }}-report-collector
-  namespace: {{ .Release.Namespace }}
+  namespace: {{ required "Namespace not set" .Values.global.namespace }}
 spec:
   minAvailable: {{ .Values.reportCollector.podDisruptionBudget.minAvailable }}
   selector:
