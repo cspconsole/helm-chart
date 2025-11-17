@@ -130,12 +130,12 @@ spec:
         volumeMounts:
         {{- if .Values.global.externalServices.elasticsearch.tls.enabled }}
         - name: elastic-ca
-          mountPath: /opt/servant/request-analyzer/certs/elasticsearch
+          mountPath: /opt/servant/report-processor/certs/elasticsearch
           readOnly: true
         {{- end }}
         {{- if .Values.global.externalServices.rabbitmq.tls.enabled }}
         - name: rabbitmq-ca
-          mountPath: /opt/servant/request-analyzer/certs/rabbitmq
+          mountPath: /opt/servant/report-processor/certs/rabbitmq
           readOnly: true
         {{- end }}
       volumes:
