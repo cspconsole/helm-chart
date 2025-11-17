@@ -4,7 +4,7 @@ metadata:
   name: {{ template "cspconsole.fullname" . }}-processor
   namespace: {{ .Release.Namespace }}
 spec:
-  replicas: 2
+  replicas: {{ .Values.reportProcessor.hpa.minReplicas }}
   strategy:
     type: {{ .Values.reportProcessor.deployment.type }}
     {{- if eq .Values.reportProcessor.deployment.type "RollingUpdate" }}
@@ -35,9 +35,23 @@ spec:
                 - key: app
                   operator: In
                   values:
-                  - {{ template "cspconsole.fullname" . }}
+                  - {{ template "cspconsole.fullname" . }}-processor
               topologyKey: "kubernetes.io/hostname"
       terminationGracePeriodSeconds: {{ .Values.reportProcessor.terminationGracePeriod }}
+      {{- if and .Values.global.externalServices.rabbitmq.serviceIp .Values.global.externalServices.rabbitmq.hostname }}
+      hostAliases:
+      - ip: {{ .Values.global.externalServices.rabbitmq.serviceIp }}
+        hostnames:
+        - {{ .Values.global.externalServices.rabbitmq.hostname | quote }}
+      {{- end }}
+      {{- with .Values.reportProcessor.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.reportProcessor.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       containers:
       - name: processor
         image: {{ template "cspconsole.reportProcessor.repository" . }}
@@ -150,13 +164,10 @@ spec:
                 key: dbPassword
           - name: QUEUE_PREFETCH_COUNT
             value: "5"
+        {{- if .Values.reportProcessor.resources }}
         resources:
-          requests:
-            cpu: 25m
-            memory: 150Mi # if debug mode for logger enalbed 192Mi required otherwise 150Mi
-          limits:
-            cpu: 25m
-            memory: 150Mi # if debug mode for logger enalbed 192Mi required otherwise 150Mi
+          {{- toYaml .Values.reportProcessor.resources | nindent 10 }}
+        {{- end }}
         lifecycle:
           preStop:
             exec:

@@ -38,6 +38,14 @@ spec:
                   - {{ template "cspconsole.fullname" . }}-config-provider
               topologyKey: "kubernetes.io/hostname"
       terminationGracePeriodSeconds: {{ .Values.configProvider.terminationGracePeriod }}
+      {{- with .Values.configProvider.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.configProvider.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       containers:
       - name: config-provider
         image: {{ template "cspconsole.configProvider.repository" . }}
@@ -104,10 +112,7 @@ spec:
           timeoutSeconds: 5
           successThreshold: 1
           failureThreshold: 2
+        {{- if .Values.configProvider.resources }}
         resources:
-          requests:
-            cpu: {{ .Values.configProvider.resources.requests.cpu }}
-            memory: {{ .Values.configProvider.resources.requests.memory }}
-          limits:
-            cpu: {{ .Values.configProvider.resources.limits.cpu }}
-            memory: {{ .Values.configProvider.resources.limits.memory }}
+          {{- toYaml .Values.configProvider.resources | nindent 10 }}
+        {{- end }}

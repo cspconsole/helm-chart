@@ -38,10 +38,20 @@ spec:
                   - {{ template "cspconsole.fullname" . }}-report-collector
               topologyKey: "kubernetes.io/hostname"
       terminationGracePeriodSeconds: {{ .Values.reportCollector.terminationGracePeriod }}
+      {{- if and .Values.global.externalServices.rabbitmq.serviceIp .Values.global.externalServices.rabbitmq.hostname }}
       hostAliases:
-      - ip: {{ .Values.reportCollector.envs.queueServiceIp }}
+      - ip: {{ .Values.global.externalServices.rabbitmq.serviceIp }}
         hostnames:
-        - "rabbitmq.default.svc.cluster.local"
+        - {{ .Values.global.externalServices.rabbitmq.hostname | quote }}
+      {{- end }}
+      {{- with .Values.reportCollector.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.reportCollector.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       containers:
       - name: report-collector
         image: {{ template "cspconsole.reportCollector.repository" . }}
@@ -140,13 +150,10 @@ spec:
           timeoutSeconds: 5
           successThreshold: 1
           failureThreshold: 2
+        {{- if .Values.reportCollector.resources }}
         resources:
-          requests:
-            cpu: {{ .Values.reportCollector.resources.requests.cpu }}
-            memory: {{ .Values.reportCollector.resources.requests.memory }}
-          limits:
-            cpu: {{ .Values.reportCollector.resources.limits.cpu }}
-            memory: {{ .Values.reportCollector.resources.limits.memory }}
+          {{- toYaml .Values.reportCollector.resources | nindent 10 }}
+        {{- end }}
         volumeMounts:
         {{- if .Values.global.externalServices.rabbitmq.tls.enabled }}
         - name: queue-cacert

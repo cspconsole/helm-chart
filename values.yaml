@@ -13,12 +13,16 @@ global:
   # Third-party service TLS/SSL certificates
   externalServices:
     elasticsearch:
+      # serviceIp: 10.0.0.2
+      # hostname: elasticsearch.default.svc.cluster.local
       tls:
         enabled: true
         # CA certificate for Elasticsearch connection
         secretName: ""  # defaults to chart fullname
         secretKey: searchCaCert
     rabbitmq:
+      # serviceIp: 10.0.0.1
+      # hostname: rabbitmq.default.svc.cluster.local
       tls:
         enabled: true
         # CA certificate for RabbitMQ connection
@@ -47,9 +51,6 @@ reportCollector:
     tag: latest
     pullPolicy: Always
 
-  envs:
-    # queueServiceIp: 10.0.0.1
-      
   service:
     type: ClusterIP
     ports:
@@ -108,7 +109,12 @@ reportProcessor:
 
   nodeSelector:
     agentpool: dynamicpoolb
-
+  
+  resources: {}
+    # requests:
+      # cpu: 200m
+      # memory: 512Mi
+  
   tolerations: []
 
   affinity: {}
