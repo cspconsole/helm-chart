@@ -1,0 +1,200 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "cspconsole.fullname" . }}-processor
+  namespace: {{ required "Namespace not set" .Values.global.namespace }}
+spec:
+  replicas: 2
+  strategy:
+    type: {{ .Values.reportProcessor.deployment.type }}
+    {{- if eq .Values.reportProcessor.deployment.type "RollingUpdate" }}
+    rollingUpdate:
+      maxSurge: {{ .Values.reportProcessor.deployment.maxSurge }}
+      maxUnavailable: {{ .Values.reportProcessor.deployment.maxUnavailable }}
+    {{- end }}
+  selector:
+    matchLabels:
+      app: {{ template "cspconsole.fullname" . }}-processor
+  template:
+    metadata:
+      labels:
+        app: {{ template "cspconsole.fullname" . }}-processor
+    spec:
+      {{- if .Values.reportProcessor.nodeSelector }}
+      nodeSelector:
+        {{- toYaml .Values.reportProcessor.nodeSelector | nindent 8 }}
+      {{- end }}
+      priorityClassName: high-priority
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - {{ template "cspconsole.fullname" . }}
+              topologyKey: "kubernetes.io/hostname"
+      terminationGracePeriodSeconds: {{ .Values.reportProcessor.terminationGracePeriod }}
+      containers:
+      - name: processor
+        image: {{ template "request-analyzer.repository.application" . }}
+        imagePullPolicy: {{ .Values.reportProcessor.image.pullPolicy }}
+        args: ["node", "./build/Processor.js"]
+        securityContext:
+          runAsNonRoot: true
+        env:
+          - name: QUEUE_SCHEME
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.reportProcessor.secretName }}
+                key: queueScheme
+          - name: QUEUE_HOST
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.reportProcessor.secretName }}
+                key: queueHost
+          - name: QUEUE_PORT
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.reportProcessor.secretName }}
+                key: queuePort
+          - name: QUEUE_NAME
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.reportProcessor.secretName }}
+                key: queueName
+          - name: EXCHANGE_NAME
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.reportProcessor.secretName }}
+                key: exchangeName
+          - name: QUEUE_USERNAME
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.reportProcessor.secretName }}
+                key: queueUsername
+          - name: QUEUE_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.reportProcessor.secretName }}
+                key: queuePassword
+          - name: SEARCH_SCHEME
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.reportProcessor.secretName }}
+                key: searchScheme
+          - name: SEARCH_HOST
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.reportProcessor.secretName }}
+                key: searchHost
+          - name: SEARCH_PORT
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.reportProcessor.secretName }}
+                key: searchPort
+          - name: SEARCH_USERNAME
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.reportProcessor.secretName }}
+                key: searchUsername
+          - name: SEARCH_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.reportProcessor.secretName }}
+                key: searchPassword
+          - name: SEARCH_INDEX
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.reportProcessor.secretName }}
+                key: searchIndex
+          - name: REDIS_HOST
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.reportProcessor.secretName }}
+                key: redisHost
+          - name: REDIS_PORT
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.reportProcessor.secretName }}
+                key: redisPort
+          - name: LOGGER_LEVEL
+            value: {{ .Values.reportProcessor.logger.level | quote }}
+          - name: DB_HOST
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.reportProcessor.secretName }}
+                key: dbHost
+          - name: DB_PORT
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.reportProcessor.secretName }}
+                key: dbPort
+          - name: DB_DATABASE
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.reportProcessor.secretName }}
+                key: dbName
+          - name: DB_USERNAME
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.reportProcessor.secretName }}
+                key: dbUsername
+          - name: DB_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.reportProcessor.secretName }}
+                key: dbPassword
+          - name: QUEUE_PREFETCH_COUNT
+            value: "5"
+        resources:
+          requests:
+            cpu: 25m
+            memory: 150Mi # if debug mode for logger enalbed 192Mi required otherwise 150Mi
+          limits:
+            cpu: 25m
+            memory: 150Mi # if debug mode for logger enalbed 192Mi required otherwise 150Mi
+        lifecycle:
+          preStop:
+            exec:
+              command: [
+                "sh", "-c",
+                # Gracefully shutdown google-chrome
+                # SIGQUIT is signal number 3 based on kill -L
+                # 10s to wait to deregister pod from control plane so that no new traffic comes in during termination
+                "sleep 10 && kill -s 3 1",
+              ]
+        volumeMounts:
+        {{- if .Values.global.externalServices.elasticsearch.tls.enabled }}
+        - name: elastic-ca
+          mountPath: /opt/servant/request-analyzer/certs/elasticsearch
+          readOnly: true
+        {{- end }}
+        {{- if .Values.global.externalServices.rabbitmq.tls.enabled }}
+        - name: rabbitmq-ca
+          mountPath: /opt/servant/request-analyzer/certs/rabbitmq
+          readOnly: true
+        {{- end }}
+      volumes:
+      {{- if .Values.global.externalServices.elasticsearch.tls.enabled }}
+      - name: elastic-ca
+        secret:
+          secretName: {{ default (include "cspconsole.fullname" .) .Values.global.externalServices.elasticsearch.tls.secretName }}
+          items:
+          - key: {{ .Values.global.externalServices.elasticsearch.tls.secretKey }}
+            path: ca_certificate.pem
+            mode: 0444
+      {{- end }}
+      {{- if .Values.global.externalServices.rabbitmq.tls.enabled }}
+      - name: rabbitmq-ca
+        secret:
+          secretName: {{ default (include "cspconsole.fullname" .) .Values.global.externalServices.rabbitmq.tls.secretName }}
+          items:
+          - key: {{ .Values.global.externalServices.rabbitmq.tls.secretKey }}
+            path: ca_certificate.pem
+            mode: 0444
+      {{- end }}
+      

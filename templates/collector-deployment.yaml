@@ -148,13 +148,17 @@ spec:
             cpu: {{ .Values.reportCollector.resources.limits.cpu }}
             memory: {{ .Values.reportCollector.resources.limits.memory }}
         volumeMounts:
+        {{- if .Values.global.externalServices.rabbitmq.tls.enabled }}
         - name: queue-cacert
           mountPath: /var/www/cspconsole/certs/
           readOnly: true
+        {{- end }}
       volumes:
+      {{- if .Values.global.externalServices.rabbitmq.tls.enabled }}
       - name: queue-cacert
         secret:
-          secretName: {{ .Values.reportCollector.secretName }}
+          secretName: {{ default .Values.reportCollector.secretName .Values.global.externalServices.rabbitmq.tls.secretName }}
           items:
-            - key: queueCa.crt
+            - key: {{ .Values.global.externalServices.rabbitmq.tls.secretKey }}
               path: ca_certificate.pem
+      {{- end }}

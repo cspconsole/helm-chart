@@ -1,0 +1,29 @@
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ template "cspconsole.fullname" . }}-processor
+  namespace: {{ required "Namespace not set" .Values.global.namespace }}
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ template "cspconsole.fullname" . }}-processor
+  minReplicas: {{ .Values.reportProcessor.hpa.minReplicas }}
+  behavior:
+    scaleDown:
+      policies:
+      - type: Percent
+        value: 10
+        periodSeconds: 30
+      - type: Pods
+        value: 2
+        periodSeconds: 30
+      selectPolicy: Min
+  maxReplicas: {{ .Values.reportProcessor.hpa.maxReplicas }}
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: {{ .Values.reportProcessor.hpa.averageUtilization }}
