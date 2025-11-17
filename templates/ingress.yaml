@@ -4,11 +4,11 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: {{ template "cspconsole.fullname" . }}
-  namespace: {{ required "Namespace not set" .Values.global.namespace }}
+  namespace: {{ .Release.Namespace }}
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt
     nginx.ingress.kubernetes.io/use-regex: "true"
-    nginx.ingress.kubernetes.io/auth-tls-secret: {{ required "Namespace not set" .Values.global.namespace }}/{{ template "cspconsole.fullname" . }}-certs
+    nginx.ingress.kubernetes.io/auth-tls-secret: {{ .Release.Namespace }}/{{ template "cspconsole.fullname" . }}-certs
     nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
     nginx.ingress.kubernetes.io/proxy-buffer-size: "16k"
     nginx.ingress.kubernetes.io/proxy-read-timeout: "10"
