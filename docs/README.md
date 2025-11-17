@@ -42,9 +42,13 @@ helm uninstall my-release
 
 | Name | Description | Value |
 |------|-------------|-------|
+| `global.externalServices.elasticsearch.serviceIp` | Elasticsearch service IP for host aliases (optional) | `""` |
+| `global.externalServices.elasticsearch.hostname` | Elasticsearch hostname for host aliases (optional) | `""` |
 | `global.externalServices.elasticsearch.tls.enabled` | Enable Elasticsearch TLS certificate mounting | `true` |
 | `global.externalServices.elasticsearch.tls.secretName` | Secret name for Elasticsearch CA cert (defaults to chart fullname) | `""` |
 | `global.externalServices.elasticsearch.tls.secretKey` | Secret key containing Elasticsearch CA certificate | `searchCaCert` |
+| `global.externalServices.rabbitmq.serviceIp` | RabbitMQ service IP for host aliases (optional) | `""` |
+| `global.externalServices.rabbitmq.hostname` | RabbitMQ hostname for host aliases (optional) | `""` |
 | `global.externalServices.rabbitmq.tls.enabled` | Enable RabbitMQ TLS certificate mounting | `true` |
 | `global.externalServices.rabbitmq.tls.secretName` | Secret name for RabbitMQ CA cert (defaults to chart fullname) | `""` |
 | `global.externalServices.rabbitmq.tls.secretKey` | Secret key containing RabbitMQ CA certificate | `queueCaCert` |
@@ -90,6 +94,7 @@ helm uninstall my-release
 | `reportProcessor.image.tag` | Image tag | `latest` |
 | `reportProcessor.image.pullPolicy` | Image pull policy | `Always` |
 | `reportProcessor.logger.level` | Logger level (error, warn, info, debug) | `error` |
+| `reportProcessor.resources` | Resource limits and requests | `{}` |
 | `reportProcessor.nodeSelector` | Node selector | `{"agentpool": "dynamicpoolb"}` |
 | `reportProcessor.tolerations` | Tolerations | `[]` |
 | `reportProcessor.affinity` | Affinity rules | `{}` |
@@ -146,9 +151,13 @@ This chart provides support for Ingress resources. If you have an ingress contro
 
 The chart configures Horizontal Pod Autoscaler (HPA) and Pod Disruption Budgets (PDB) for all services to ensure high availability.
 
-### External Services TLS/SSL Configuration
+### External Services Configuration
 
-The chart supports mounting TLS/SSL certificates for external services like Elasticsearch and RabbitMQ. These are configured globally and can be enabled/disabled:
+The chart supports comprehensive configuration for external services like Elasticsearch and RabbitMQ under `global.externalServices`:
+
+#### TLS/SSL Certificates
+
+Mounts CA certificates for secure connections to external services:
 
 - **Elasticsearch**: Mounts CA certificate for secure connections to Elasticsearch
 - **RabbitMQ**: Mounts CA certificate for secure connections to RabbitMQ/Queue services
@@ -161,6 +170,19 @@ helm install my-release \
   .
 ```
 
+#### Host Aliases
+
+For environments where external services need custom DNS resolution, configure host aliases using `serviceIp` and `hostname`:
+
+```bash
+helm install my-release \
+  --set global.externalServices.rabbitmq.serviceIp=10.0.0.1 \
+  --set global.externalServices.rabbitmq.hostname=rabbitmq.default.svc.cluster.local \
+  .
+```
+
+This configuration applies to both collector and processor services that interact with the queue.
+
 ### Logger Configuration
 
 The report processor supports configurable logger levels through `reportProcessor.logger.level`. Available options:
@@ -169,7 +191,24 @@ The report processor supports configurable logger levels through `reportProcesso
 - `info`: Log informational messages, warnings, and errors
 - `debug`: Log all messages including debug information
 
-Note: When using `debug` mode, increase memory allocation to 192Mi instead of the default 150Mi.
+Note: When using `debug` mode, you may need to adjust memory resources accordingly.
+
+### Resource Management
+
+All services support custom resource limits and requests through the `resources` parameter. By default, resources are not specified (`{}`), allowing for flexible deployment across different environments.
+
+Example configuration:
+
+```yaml
+reportCollector:
+  resources:
+    requests:
+      cpu: 200m
+      memory: 512Mi
+    limits:
+      cpu: 500m
+      memory: 1Gi
+```
 
 ## Upgrading
 

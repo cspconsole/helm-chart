@@ -1,13 +1,13 @@
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
-  name: {{ template "cspconsole.fullname" . }}-processor
+  name: {{ template "cspconsole.fullname" . }}-report-processor
   namespace: {{ .Release.Namespace }}
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: {{ template "cspconsole.fullname" . }}-processor
+    name: {{ template "cspconsole.fullname" . }}-report-processor
   minReplicas: {{ .Values.reportProcessor.hpa.minReplicas }}
   behavior:
     scaleDown:

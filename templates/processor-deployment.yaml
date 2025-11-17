@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ template "cspconsole.fullname" . }}-processor
+  name: {{ template "cspconsole.fullname" . }}-report-processor
   namespace: {{ .Release.Namespace }}
 spec:
   replicas: {{ .Values.reportProcessor.hpa.minReplicas }}
@@ -14,11 +14,11 @@ spec:
     {{- end }}
   selector:
     matchLabels:
-      app: {{ template "cspconsole.fullname" . }}-processor
+      app: {{ template "cspconsole.fullname" . }}-report-processor
   template:
     metadata:
       labels:
-        app: {{ template "cspconsole.fullname" . }}-processor
+        app: {{ template "cspconsole.fullname" . }}-report-processor
     spec:
       {{- if .Values.reportProcessor.nodeSelector }}
       nodeSelector:
@@ -35,7 +35,7 @@ spec:
                 - key: app
                   operator: In
                   values:
-                  - {{ template "cspconsole.fullname" . }}-processor
+                  - {{ template "cspconsole.fullname" . }}-report-processor
               topologyKey: "kubernetes.io/hostname"
       terminationGracePeriodSeconds: {{ .Values.reportProcessor.terminationGracePeriod }}
       {{- if and .Values.global.externalServices.rabbitmq.serviceIp .Values.global.externalServices.rabbitmq.hostname }}
