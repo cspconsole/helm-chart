@@ -61,102 +61,57 @@ spec:
           runAsNonRoot: true
         env:
           - name: QUEUE_SCHEME
-            valueFrom:
-              secretKeyRef:
-                name: {{ .Values.reportProcessor.secretName }}
-                key: queueScheme
+            value: {{ .Values.global.externalServices.rabbitmq.scheme | quote }}
           - name: QUEUE_HOST
             valueFrom:
               secretKeyRef:
                 name: {{ .Values.reportProcessor.secretName }}
                 key: queueHost
           - name: QUEUE_PORT
-            valueFrom:
-              secretKeyRef:
-                name: {{ .Values.reportProcessor.secretName }}
-                key: queuePort
+            value: {{ .Values.global.externalServices.rabbitmq.port | quote }}
           - name: QUEUE_NAME
-            valueFrom:
-              secretKeyRef:
-                name: {{ .Values.reportProcessor.secretName }}
-                key: queueName
+            value: {{ .Values.global.externalServices.rabbitmq.queueName | quote }}
           - name: EXCHANGE_NAME
-            valueFrom:
-              secretKeyRef:
-                name: {{ .Values.reportProcessor.secretName }}
-                key: exchangeName
+            value: {{ .Values.global.externalServices.rabbitmq.exchangeName | quote }}
           - name: QUEUE_USERNAME
-            valueFrom:
-              secretKeyRef:
-                name: {{ .Values.reportProcessor.secretName }}
-                key: queueUsername
+            value: {{ .Values.global.externalServices.rabbitmq.username | quote }}
           - name: QUEUE_PASSWORD
             valueFrom:
               secretKeyRef:
                 name: {{ .Values.reportProcessor.secretName }}
                 key: queuePassword
           - name: SEARCH_SCHEME
-            valueFrom:
-              secretKeyRef:
-                name: {{ .Values.reportProcessor.secretName }}
-                key: searchScheme
+            value: {{ .Values.global.externalServices.elasticsearch.scheme | quote }}
           - name: SEARCH_HOST
             valueFrom:
               secretKeyRef:
                 name: {{ .Values.reportProcessor.secretName }}
                 key: searchHost
           - name: SEARCH_PORT
-            valueFrom:
-              secretKeyRef:
-                name: {{ .Values.reportProcessor.secretName }}
-                key: searchPort
+            value: {{ .Values.global.externalServices.elasticsearch.port | quote }}
           - name: SEARCH_USERNAME
-            valueFrom:
-              secretKeyRef:
-                name: {{ .Values.reportProcessor.secretName }}
-                key: searchUsername
+            value: {{ .Values.global.externalServices.elasticsearch.username | quote }}
           - name: SEARCH_PASSWORD
             valueFrom:
               secretKeyRef:
                 name: {{ .Values.reportProcessor.secretName }}
                 key: searchPassword
           - name: SEARCH_INDEX
-            valueFrom:
-              secretKeyRef:
-                name: {{ .Values.reportProcessor.secretName }}
-                key: searchIndex
+            value: {{ .Values.global.externalServices.elasticsearch.index | quote }}
           - name: REDIS_HOST
-            valueFrom:
-              secretKeyRef:
-                name: {{ .Values.reportProcessor.secretName }}
-                key: redisHost
+            value: {{ .Values.global.externalServices.redis.hostname | quote }}
           - name: REDIS_PORT
-            valueFrom:
-              secretKeyRef:
-                name: {{ .Values.reportProcessor.secretName }}
-                key: redisPort
+            value: {{ .Values.global.externalServices.redis.port | quote }}
           - name: LOGGER_LEVEL
             value: {{ .Values.reportProcessor.logger.level | quote }}
           - name: DB_HOST
-            valueFrom:
-              secretKeyRef:
-                name: {{ .Values.reportProcessor.secretName }}
-                key: dbHost
+            value: {{ .Values.global.externalServices.mysql.hostname | quote }}
           - name: DB_PORT
-            valueFrom:
-              secretKeyRef:
-                name: {{ .Values.reportProcessor.secretName }}
-                key: dbPort
+            value: {{ .Values.global.externalServices.mysql.port | quote }}
           - name: DB_DATABASE
-            valueFrom:
-              secretKeyRef:
-                name: {{ .Values.reportProcessor.secretName }}
-                key: dbName
+            value: {{ .Values.global.externalServices.mysql.database | quote }}
           - name: DB_USERNAME
-            valueFrom:
-              secretKeyRef:
-                name: {{ .Values.reportProcessor.secretName }}
-                key: dbUsername
+            value: {{ .Values.global.externalServices.mysql.username | quote }}
           - name: DB_PASSWORD
             valueFrom:
               secretKeyRef:

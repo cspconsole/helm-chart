@@ -56,40 +56,22 @@ spec:
           - containerPort: 8000
         env:
         - name: DB_HOST
-          valueFrom:
-            secretKeyRef:
-              name: {{ .Values.configProvider.secretName }}
-              key: dbHost
+          value: {{ .Values.global.externalServices.mysql.hostname | quote }}
         - name: DB_PORT
-          valueFrom:
-            secretKeyRef:
-              name: {{ .Values.configProvider.secretName }}
-              key: dbPort
+          value: {{ .Values.global.externalServices.mysql.port | quote }}
         - name: DB_DATABASE
-          valueFrom:
-            secretKeyRef:
-              name: {{ .Values.configProvider.secretName }}
-              key: dbName
+          value: {{ .Values.global.externalServices.mysql.database | quote }}
         - name: DB_USERNAME
-          valueFrom:
-            secretKeyRef:
-              name: {{ .Values.configProvider.secretName }}
-              key: dbUsername
+          value: {{ .Values.global.externalServices.mysql.username | quote }}
         - name: DB_PASSWORD
           valueFrom:
             secretKeyRef:
               name: {{ .Values.configProvider.secretName }}
               key: dbPassword
         - name: REDIS_HOST
-          valueFrom:
-            secretKeyRef:
-              name: {{ .Values.configProvider.secretName }}
-              key: redisHost
+          value: {{ .Values.global.externalServices.redis.hostname | quote }}
         - name: REDIS_PORT
-          valueFrom:
-            secretKeyRef:
-              name: {{ .Values.configProvider.secretName }}
-              key: redisPort
+          value: {{ .Values.global.externalServices.redis.port | quote }}
         livenessProbe:
           exec:
             command:

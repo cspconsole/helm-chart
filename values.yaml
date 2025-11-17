@@ -14,7 +14,11 @@ global:
   externalServices:
     elasticsearch:
       # serviceIp: 10.0.0.2
-      # hostname: elasticsearch.default.svc.cluster.local
+      hostname: elasticsearch-ingest.default.svc.cluster.local
+      scheme: https
+      port: 9200
+      index: csp-reports
+      username: elastic
       tls:
         enabled: true
         # CA certificate for Elasticsearch connection
@@ -22,12 +26,25 @@ global:
         secretKey: searchCaCert
     rabbitmq:
       # serviceIp: 10.0.0.1
-      # hostname: rabbitmq.default.svc.cluster.local
+      hostname: rabbitmq.default.svc.cluster.local
+      scheme: amqps
+      port: 5671
+      queueName: reports
+      exchangeName: default-exchange
+      username: guest
       tls:
         enabled: true
         # CA certificate for RabbitMQ connection
         secretName: ""  # defaults to chart fullname
         secretKey: queueCaCert
+    redis:
+      hostname: redis-master.default.svc.cluster.local
+      port: 6379
+    mysql:
+      hostname: mysql.default.svc.cluster.local
+      port: 3306
+      database: cspconsole
+      username: cspconsole-user
 
 reportCollector:
   hpa:
@@ -75,8 +92,8 @@ reportCollector:
     #  cpu: 100m
     #  memory: 128Mi
 
-  nodeSelector:
-    agentpool: dynamicpoolb
+  nodeSelector: {}
+    # node-role: worker
 
   tolerations: []
 
@@ -107,8 +124,8 @@ reportProcessor:
   logger:
     level: error  # Options: error, warn, info, debug
 
-  nodeSelector:
-    agentpool: dynamicpoolb
+  nodeSelector: {}
+    # node-role: worker
   
   resources: {}
     # requests:
@@ -170,8 +187,8 @@ configProvider:
     #  cpu: 100m
     #  memory: 128Mi
 
-  nodeSelector:
-    agentpool: dynamicpoolb
+  nodeSelector: {}
+    # node-role: worker
 
   tolerations: []
 
