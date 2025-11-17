@@ -40,7 +40,7 @@ spec:
       terminationGracePeriodSeconds: {{ .Values.reportProcessor.terminationGracePeriod }}
       containers:
       - name: processor
-        image: {{ template "request-analyzer.repository.application" . }}
+        image: {{ template "cspconsole.reportProcessor.repository" . }}
         imagePullPolicy: {{ .Values.reportProcessor.image.pullPolicy }}
         args: ["node", "./build/Processor.js"]
         securityContext:

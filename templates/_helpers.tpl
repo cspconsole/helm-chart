@@ -17,6 +17,9 @@ If release name contains chart name it will be used as a full name.
 {{- define "cspconsole.configProvider.repository" -}}
 {{- printf "%s:%s" .Values.configProvider.image.repository .Values.configProvider.image.tag -}}
 {{- end -}}
+{{- define "cspconsole.reportProcessor.repository" -}}
+{{- printf "%s:%s" .Values.reportProcessor.image.repository .Values.reportProcessor.image.tag -}}
+{{- end -}}
 {{- define "cspconsole.fullname" -}}
 {{- if .Values.fullnameOverride -}}
 {{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" -}}
