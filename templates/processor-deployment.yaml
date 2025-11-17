@@ -63,10 +63,7 @@ spec:
           - name: QUEUE_SCHEME
             value: {{ .Values.global.externalServices.rabbitmq.scheme | quote }}
           - name: QUEUE_HOST
-            valueFrom:
-              secretKeyRef:
-                name: {{ .Values.reportProcessor.secretName }}
-                key: queueHost
+            value: {{ .Values.global.externalServices.rabbitmq.hostname | quote }}
           - name: QUEUE_PORT
             value: {{ .Values.global.externalServices.rabbitmq.port | quote }}
           - name: QUEUE_NAME
@@ -83,10 +80,7 @@ spec:
           - name: SEARCH_SCHEME
             value: {{ .Values.global.externalServices.elasticsearch.scheme | quote }}
           - name: SEARCH_HOST
-            valueFrom:
-              secretKeyRef:
-                name: {{ .Values.reportProcessor.secretName }}
-                key: searchHost
+            value: {{ .Values.global.externalServices.elasticsearch.hostname | quote }}
           - name: SEARCH_PORT
             value: {{ .Values.global.externalServices.elasticsearch.port | quote }}
           - name: SEARCH_USERNAME

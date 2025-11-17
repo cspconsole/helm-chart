@@ -14,8 +14,8 @@ global:
   externalServices:
     elasticsearch:
       # serviceIp: 10.0.0.2
-      hostname: elasticsearch-ingest.default.svc.cluster.local
       scheme: https
+      hostname: elasticsearch-ingest.default.svc.cluster.local
       port: 9200
       index: csp-reports
       username: elastic
@@ -26,8 +26,8 @@ global:
         secretKey: searchCaCert
     rabbitmq:
       # serviceIp: 10.0.0.1
-      hostname: rabbitmq.default.svc.cluster.local
       scheme: amqps
+      hostname: rabbitmq.default.svc.cluster.local
       port: 5671
       queueName: reports
       exchangeName: default-exchange
