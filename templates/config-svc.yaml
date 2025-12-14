@@ -1,3 +1,4 @@
+{{- if .Values.global.deployment.enabled }}
 kind: Service
 apiVersion: v1
 metadata:
@@ -10,4 +11,5 @@ spec:
 {{- range $index, $value := .Values.configProvider.service.ports }}
     - name: {{ $index }}
 {{ toYaml $value | trim | indent 6 }}{{- end}}
+{{- end }}
   type: {{ .Values.configProvider.service.type }}

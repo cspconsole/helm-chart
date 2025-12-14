@@ -1,3 +1,4 @@
+{{- if .Values.global.deployment.enabled }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -141,3 +142,4 @@ spec:
             - key: {{ .Values.global.externalServices.rabbitmq.tls.secretKey }}
               path: ca_certificate.pem
       {{- end }}
+{{- end }}

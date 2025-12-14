@@ -1,3 +1,4 @@
+{{- if .Values.global.deployment.enabled }}
 apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
@@ -8,3 +9,4 @@ spec:
   selector:
     matchLabels:
       app: {{ template "cspconsole.fullname" . }}-report-processor
+{{- end }}
